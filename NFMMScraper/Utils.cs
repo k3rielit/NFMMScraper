@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Net.Sockets;
 using System.Net;
@@ -30,7 +31,7 @@ namespace NFMMScraper {
             string details = "";
             try { details = await Utils.GetTextHTTP($"http://multiplayer.needformadness.com/{(nItem.Type==NFMMType.Car ? "cars" : "tracks")}/{nItem.Name.Replace(' ','_')}.txt",Encoding.Latin1); } catch(Exception) { }
             if(details.StartsWith("details(")) {
-                result = details.Split('(',')')[1].Split(',').Select(s => s.Replace(' ','_')).Where(w => w.Length > 0).ToList();
+                result = details.Split('(',')')[1].Split(',').Select(s => s.Replace(' ','_').ToLower()).Where(w => w.Length > 0).ToList();
                 result.RemoveRange(1,nItem.Type == NFMMType.Car ? 2 : 1);
             }
             return result;

@@ -15,9 +15,10 @@ namespace NFMMScraper {
         public string CarFileDir = "cars";
         public string StageFileDir = "tracks";
         public string MusicFileDir = "tracks/music";
-        public ulong SoftwareThreadCount = 10;
+        public ulong SoftwareThreadCount = 20;
         public int SaveDataRateMS = 2000;
         public int UIUpdateRateMS = 200;
+        public int WaitBeforeRepeatMS = 2000;
         public bool SaveDetails = true;
         public bool DownloadTop20 = false;
         public bool ExtractMusic = false;
