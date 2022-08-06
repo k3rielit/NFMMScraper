@@ -15,6 +15,16 @@ namespace NFMMScraper {
         public static Config RConfig = new();
         private static bool ShouldContinue = true;
         static void Main(string[] args) {
+            Task.Run(() => Init());
+            // Keep threads alive
+            ConsoleKey ck;
+            do {
+                ck = Console.ReadKey().Key;
+            }
+            while(ck != ConsoleKey.Escape);
+        }
+
+        private static async void Init() {
             // Load config and progress
 
             if(RConfig.RescanCompletedItemsOnStartup) {
@@ -31,12 +41,6 @@ namespace NFMMScraper {
             }
             Task.Run(() => UpdateUI());
             Task.Run(() => SaveData());
-            // Keep threads alive
-            ConsoleKey ck;
-            do {
-                ck = Console.ReadKey().Key;
-            }
-            while(ck!=ConsoleKey.Escape);
         }
 
         private static async void UpdateUI() {
@@ -63,9 +67,6 @@ namespace NFMMScraper {
             }
         }
 
-        // https://docs.microsoft.com/en-us/dotnet/standard/collections/thread-safe/
-        // c# concurrent collections
-        // SQLite
         private static async void SThread() {
             while(Program.ShouldContinue) {
                 NFMMItem nItem = NFMM.Queue.FirstOrDefault(new NFMMItem());
