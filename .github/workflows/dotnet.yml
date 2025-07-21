@@ -3,7 +3,7 @@ name: Build and Publish .NET 9 Console App
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -13,49 +13,49 @@ jobs:
         runtime: [linux-x64, win-x64, osx-arm64]
 
     steps:
-    - name: Checkout source
-      uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v4
 
-    - name: Get short commit hash
-      id: vars
-      run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+      - name: Get short commit hash
+        id: vars
+        run: echo "commit_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-    - name: Setup .NET 9
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '9.0.x'
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Build for ${{ matrix.runtime }}
-      run: |
-        dotnet publish -c Release -r ${{ matrix.runtime }} --output ./publish/${{ matrix.runtime }} --no-self-contained
-        cd ./publish/${{ matrix.runtime }}
-        zip ../app-${{ matrix.runtime }}-${{ steps.vars.outputs.commit_hash }}.zip *
+      - name: Build for ${{ matrix.runtime }}
+        run: |
+          dotnet publish -c Release -r ${{ matrix.runtime }} --output ./publish/${{ matrix.runtime }} --no-self-contained
+          cd ./publish/${{ matrix.runtime }}
+          zip ../app-${{ matrix.runtime }}-${{ steps.vars.outputs.commit_hash }}.zip *
 
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-${{ matrix.runtime }}
-        path: ./publish/app-${{ matrix.runtime }}-${{ steps.vars.outputs.commit_hash }}.zip
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-${{ matrix.runtime }}
+          path: ./publish/app-${{ matrix.runtime }}-${{ steps.vars.outputs.commit_hash }}.zip
 
   release:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: ./artifacts
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
 
-    - name: Create or update GitHub Release
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: latest
-        name: Latest Build from master
-        files: ./artifacts/**/*.zip
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create or update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Build from master
+          files: ./artifacts/**/*.zip
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
